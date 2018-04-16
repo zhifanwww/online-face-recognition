@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+            <link rel="stylesheet" href="css/other.css">
+    </head>
+    <body>
+            <div class="margin50">
+            <center>
+                    <div class="file-upload">
+                    <form enctype="multipart/form-data" method="post" name="upload-image" id="form" action="/image">
+                      <button class="file-upload-btn" type="submit">Add Image</button>
+                      <div class="image-upload-wrap">
+                        <input id="file" name="people" class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+                    </form>
+                        <div class="drag-text">
+                          <h3>Upload Portraits here.</h3>
+                        </div>
+                      </div>
+                      <div class="file-upload-content">
+                        <img class="file-upload-image" src="#" alt="your image" />
+                        <div class="image-title-wrap">
+                          <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
+                        </div>
+                      </div>
+                    </div>
+ 
+            </center>
+            </div>
+
+            <div class="margin50">
+            <center>
+            <canvas id="draw" width="500px" height="400px"></canvas>
+            <p id="p"></p>
+            </center>
+            </div>
+            
+            <center>
+                <video style="display:none;" id="video" width="500px" height="400px" autoplay="true"></video>
+            </center>
+            
+            <script src='/js/index.js'></script>
+            <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    </body>
+</html>

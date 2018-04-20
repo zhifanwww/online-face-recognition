@@ -1,3 +1,4 @@
+# import needed packages
 from flask import Flask, request, send_file, send_from_directory, jsonify, redirect, url_for
 from werkzeug.utils import secure_filename
 import base64
@@ -10,54 +11,56 @@ import new_recog
 from skimage import img_as_ubyte
 import boto3
 
-# TRIM = re.compile("^data:image\/(png|jpg);base64,")
-
 app = Flask(__name__)
 
 
+# when requesting the URL '/', return index.html
 @app.route('/')
 def index():
     return send_file("index.html")
 
-
+# indicate the location of required css
 @app.route('/css/<path:path>')
 def css(path):
     return send_from_directory("css", path)
 
-
+# indicate the location of required js
 @app.route('/js/<path:path>')
 def js(path):
     return send_from_directory("js", path)
 
+# when the form element requests the URL '/image', save the uploaded image to the filefolder 'known_people' 
+# and redirect to the index page
 @app.route('/image', methods=["POST"])
 def uploadImage():
     myfile = request.files['people']
     myfile.save('known_people/' + secure_filename(myfile.filename))
     return redirect(url_for('index'))
 
+# dealing with face recognition
+# this funtion accepts a frame in format of base64 and invokes funtions in 'new_recog.py' to do a face recognition after parsing it. 
 @app.route('/stream', methods=["PUT"])
 def streaming():
     data = request.data
     length = len("data:image/png;base64,")
-    #data = data.replace("data:image/png;base64,", "")
-    data = data[length:]
+    data = data[length:] # remove the header of base64
     pngframe = base64.decodebytes(data)
-    frame = imread(BytesIO(pngframe)) # (150, 300, 4)
+    frame = imread(BytesIO(pngframe)) # in format of (150, 300, 4)
     frame = rgba2rgb(frame)
     frame = img_as_ubyte(frame)
     frame = frame.astype(np.uint8)
-    # with open("xxx.png", "wb") as f:
-    #   f.write(pngframe)
 
+    # get face_locations, face_names from calling the face_recognition library
     face_locations, face_names = new_recog.recog(frame)
 
-    # when exceeding warning_count, send a warning
+    # when exceeding the warning_count, send a warning
     for name in face_names:
+        # record the unknown counts in file count.txt
         if name == "Unknown":
             with open('count.txt', 'r+') as c:
                 count = int(c.read())
                 count += 1
-                if count >= 10:
+                if count >= 20:
                     count = 0
                     warning()
                 c.seek(0)
@@ -68,12 +71,13 @@ def streaming():
     return jsonify(locations=face_locations, names=face_names)
 
 def warning():
+    # set up a client
     client = boto3.client(
         "sns",
         region_name="us-east-2"
     )
 
-    # Send your sms message.
+    # Send the sms message
     client.publish(
         Message="Hey, this is a warning message! Someone unknown is in the surveillance",
         TargetArn="arn:aws:sns:us-east-2:426162095813:face_recog"

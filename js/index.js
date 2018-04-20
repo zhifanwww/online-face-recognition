@@ -10,11 +10,12 @@ const table = document.querySelector('#table');
 
 let locations = [];
 let names = [];
-
 ctx.font = '10px Comic Sans MS';
 
+// use canvas to show the frame every 200ms in order to draw a video in the front-end
 function drawVideo(){
     ctx.drawImage(video, 0, 0, 500, 400);
+    // use the received face_locations to draw rectangulars for painting the edges of the detected faces
     if (locations.length > 0){
         for (var i = 0; i < locations.length; i++){
             l0 = locations[i][0];
@@ -26,8 +27,9 @@ function drawVideo(){
     }
 }
 
+// send frames to the server, and wait for its responses
 async function fetchData() {
-    frame = canvas.toDataURL("image/png");//format: base64
+    frame = canvas.toDataURL("image/png"); //format: base64
     let resp = await fetch("/stream", {
         method: "PUT",
         body: frame
@@ -38,7 +40,7 @@ async function fetchData() {
     textChange()
 }
 
-
+// get video data from webcams
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
  navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
  video.src = window.URL.createObjectURL(stream);
@@ -46,6 +48,7 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
  });
 }
 
+// show the received face_names below the canvas
 function textChange() {
     p.innerHTML = ""
     for (let i=0; i<names.length; i++){
@@ -54,9 +57,11 @@ function textChange() {
     }
 }
 
+// invoke drawVideo and fecthData every 200ms and 1000ms repectively
 const timeInterval1 = setInterval(drawVideo, 200);
 const timeInterval2 = setInterval(fetchData, 1000);
 
+// for creating the form to upload image
 function readURL(input) {
     if (input.files && input.files[0]) {
   
@@ -64,7 +69,7 @@ function readURL(input) {
   
       reader.onload = function(e) {
         $('.image-upload-wrap').hide();
-  
+   
         $('.file-upload-image').attr('src', e.target.result);
         $('.file-upload-content').show();
   

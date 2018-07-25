@@ -1,6 +1,8 @@
 
 Based on several blog posts on [pyimagesearch](https://www.pyimagesearch.com/).
+
 Based on a simple face recognition library(https://github.com/ageitgey/face_recognition).
+
 Based on Amazon's Messaging Service.
 
 ## Dependencies

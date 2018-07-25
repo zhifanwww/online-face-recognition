@@ -80,7 +80,7 @@ def warning():
     # Send the sms message
     client.publish(
         Message="Hey, this is a warning message! Someone unknown is in the surveillance",
-        TargetArn="arn:aws:sns:us-east-2:426162095813:face_recog"
+        TargetArn=" "#targetArn
     )
 
 if __name__ == "__main__":
